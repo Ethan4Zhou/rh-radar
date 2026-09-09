@@ -38,15 +38,35 @@ site/build_site.py   inline data.json into a single self-contained index.html
 
 ## Where the page is served
 
-GitHub Pages will not serve a private repo on a free plan, so the build is
-mirrored to a separate public repo that holds nothing but the rendered file:
+GitHub Pages serves `site/` from this repo:
 
-  https://ethan4zhou.github.io/rh-radar-site/
+  https://ethan4zhou.github.io/rh-radar/
 
-`scan/publish_site.sh` copies `site/index.html` there on every cycle. The
-scrapers, the raw data and the exclusion list stay in this private repo. Note
-that the rendered page embeds every row, so whatever the table says is public —
-the split protects the code and the raw captures, not the verdicts.
+Every scan cycle rebuilds `site/index.html` and pushes it, and Pages redeploys
+within a minute or so.
+
+## What is and is not in this repo
+
+Tracked: the scripts, the derived account table, and the rendered page — the same
+rows the site already shows.
+
+Not tracked (see `.gitignore`): the raw captures. `data/site_crawl.jsonl` is the
+scraped text of several thousand third-party sites, `data/tweets/tweets.jsonl` the
+tweets behind the contract-address check, and `data/accounts_raw.json` the profile
+dump the first pass started from. They regenerate from the three seeds, and
+republishing bulk scrapes of other people's sites and profiles serves no one.
+
+## Setting it up on another machine
+
+```bash
+git clone https://github.com/Ethan4Zhou/rh-radar.git && cd rh-radar
+npm i -g @steipete/bird          # reads X through your logged-in Chrome session
+./run.sh                         # one cycle
+PROXY=127.0.0.1:7897 ./deploy/install.sh   # optional: the two launchd agents
+```
+
+Nothing here stores a credential. `bird` reads the cookies from your own browser,
+and every script that talks to X goes through it.
 
 ## Running it
 

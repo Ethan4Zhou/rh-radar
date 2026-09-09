@@ -7,7 +7,7 @@
 
 不用装任何东西，打开这个链接就是最新的列表：
 
-https://ethan4zhou.github.io/rh-radar-site/
+https://ethan4zhou.github.io/rh-radar/
 
 每轮扫描后自动更新，刷新即可。（旧的 Claude 链接同样有效：
 https://claude.ai/code/artifact/09bbe894-1286-4289-aeca-8510df2422fd ）

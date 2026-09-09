@@ -8,7 +8,6 @@ MAX_NEW=${MAX_NEW:-25} python3 scan/ingest.py   # crawl + chain-check them, keep
 python3 scan/priority.py           # requeue tweet reading with the new arrivals
 python3 scan/build.py              # recompute token status from bio + site + tweets
 python3 site/build_site.py         # one self-contained page
-./scan/publish_site.sh             # mirror it to the public repo GitHub Pages serves
 if [[ -n "$(git status --porcelain data site)" ]]; then
   git add -A data site
   git commit -q -m "scan: $(date '+%Y-%m-%d %H:%M')"
