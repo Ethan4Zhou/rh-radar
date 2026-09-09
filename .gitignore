@@ -1,0 +1,23 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+# Machine-local runtime state
+logs/
+data/tweets/.fetch.lock
+data/query_ids_found.txt
+
+# Raw captures. These are bulk scrapes of third-party sites and X profiles —
+# they rebuild from the seeds and there is no reason to republish them.
+data/site_crawl.jsonl
+data/tweets/tweets.jsonl
+data/accounts_raw.json
+data/candidates.jsonl
+data/seen.json
+data/vf_seen.json
+data/ingested.json
+data/verified_followers_*.jsonl
+data/ca_raw.json
+data/onchain.json
+data/tweets/priority.json
+data/tweets/progress.log

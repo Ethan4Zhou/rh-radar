@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.__USER__.rhradar.tweets</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string><string>-lc</string>
+    <string>cd __HOME__/Projects/rh-radar &amp;&amp; /usr/bin/python3 scan/tweets_fast.py</string>
+  </array>
+  <key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>
+  <key>ThrottleInterval</key><integer>300</integer>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>__HOME__/Projects/rh-radar/logs/tweets.log</string>
+  <key>StandardErrorPath</key><string>__HOME__/Projects/rh-radar/logs/tweets.err</string>
+  <key>WorkingDirectory</key><string>__HOME__/Projects/rh-radar</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>NODE_USE_ENV_PROXY</key><string>1</string>
+    <key>HTTP_PROXY</key><string>http://__PROXY_HOST_PORT__</string>
+    <key>HTTPS_PROXY</key><string>http://__PROXY_HOST_PORT__</string>
+    <key>ALL_PROXY</key><string>socks5://__PROXY_HOST_PORT__</string>
+    <key>PATH</key><string>__HOME__/.nvm/versions/node/v25.8.0/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+</dict>
+</plist>

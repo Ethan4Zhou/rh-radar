@@ -1,0 +1,287 @@
+<title>Robinhood 链项目核验台</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+ --bg:#F1F4F1;--surface:#FFFFFF;--ink:#131A16;--muted:#5C6B62;--faint:#8A978F;--rule:#DBE2DC;--rule2:#EBEFEA;
+ --accent:#0F6B45;--accent-bg:#E2EFE8;
+ --v0:#0F6B45;--v1:#6C7B72;--v2:#9A7B12;--v3:#A8322A;
+ --v0bg:#E2EFE8;--v1bg:#EDEFED;--v2bg:#F7EFD8;--v3bg:#F8E4E1;
+ --shadow:0 1px 2px rgba(19,26,22,.06);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#0E1412;--surface:#151D19;--ink:#E3EAE5;--muted:#93A399;--faint:#6E7D75;--rule:#26312B;--rule2:#1D2621;
+ --accent:#45C88B;--accent-bg:#12291F;
+ --v0:#45C88B;--v1:#93A399;--v2:#D2AB40;--v3:#E4685B;
+ --v0bg:#12291F;--v1bg:#1E2622;--v2bg:#2C2513;--v3bg:#2E1917;
+ --shadow:0 1px 2px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+ --bg:#0E1412;--surface:#151D19;--ink:#E3EAE5;--muted:#93A399;--faint:#6E7D75;--rule:#26312B;--rule2:#1D2621;
+ --accent:#45C88B;--accent-bg:#12291F;
+ --v0:#45C88B;--v1:#93A399;--v2:#D2AB40;--v3:#E4685B;
+ --v0bg:#12291F;--v1bg:#1E2622;--v2bg:#2C2513;--v3bg:#2E1917;
+ --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);margin:0;font-size:14px;line-height:1.55;
+ font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:1360px;margin:0 auto;padding:36px 22px 80px}
+h1{font-family:Archivo,sans-serif;font-weight:800;font-size:clamp(26px,3.4vw,38px);letter-spacing:-.022em;line-height:1.08;margin:0 0 10px;text-wrap:balance}
+.top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:end;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+.lede{color:var(--muted);max-width:64ch;margin:0}
+.lede b{color:var(--ink);font-weight:600}
+.stamp{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint);text-align:right;line-height:1.85;white-space:nowrap}
+.stamp b{color:var(--muted);font-weight:500}
+section{margin-top:26px}
+.h2{font-family:Archivo,sans-serif;font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:baseline;gap:10px}
+.h2 em{font-style:normal;font-family:"IBM Plex Sans";letter-spacing:0;text-transform:none;font-weight:400;font-size:12.5px;color:var(--faint)}
+/* stacked verdict bar */
+.vbar{display:flex;height:38px;border-radius:3px;overflow:hidden;border:1px solid var(--rule)}
+.vbar button{border:0;padding:0;cursor:pointer;font:inherit;position:relative;transition:filter .15s}
+.vbar button:hover{filter:brightness(1.06)}
+.vbar button[aria-pressed="true"]{box-shadow:inset 0 0 0 3px var(--ink)}
+.vlegend{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:8px}
+.vlegend div{padding-right:12px}
+.vlegend .k{display:flex;align-items:center;gap:6px;font-weight:600;font-size:13px}
+.dot{width:9px;height:9px;border-radius:2px;flex:none}
+.vlegend .n{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3}
+.vlegend .d{color:var(--muted);font-size:12px;line-height:1.45}
+/* category matrix */
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:2px 26px}
+.crow{display:grid;grid-template-columns:76px 1fr 40px;align-items:center;gap:9px;padding:3px 4px;cursor:pointer;border:0;background:none;font:inherit;color:inherit;text-align:left;border-radius:3px}
+.crow:hover{background:var(--rule2)}
+.crow[aria-pressed="true"]{background:var(--accent-bg);box-shadow:inset 2px 0 0 var(--accent)}
+.crow .cn{font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .ct{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+.mini{display:flex;height:11px;border-radius:2px;overflow:hidden;background:var(--rule2)}
+/* controls */
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+.ctl input,.ctl select{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--rule);padding:7px 9px;border-radius:4px}
+.ctl input{min-width:230px}
+.ctl button.reset{font:inherit;font-size:12.5px;color:var(--muted);background:none;border:1px solid var(--rule);padding:7px 10px;border-radius:4px;cursor:pointer}
+.ctl button.reset:hover{color:var(--ink);border-color:var(--muted)}
+.cnt{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+/* table */
+.tw{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;min-width:1340px}
+th{position:sticky;top:0;z-index:2;background:var(--surface);text-align:left;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+ color:var(--faint);font-weight:600;padding:9px 9px;border-bottom:1px solid var(--rule);white-space:nowrap}
+th[data-k]{cursor:pointer;user-select:none}
+th[data-k]:hover{color:var(--ink)}
+th.on{color:var(--ink)}
+th.on::after{content:" ↓";font-size:10px}
+th.on.asc::after{content:" ↑"}
+td{padding:8px 9px;border-bottom:1px solid var(--rule2);vertical-align:top}
+tbody tr:hover td{background:var(--rule2)}
+tbody tr:last-child td{border-bottom:0}
+.vp{display:inline-block;font-size:11px;font-weight:600;padding:2px 7px;border-radius:3px;white-space:nowrap;line-height:1.5}
+.nm{font-weight:600;white-space:nowrap}
+.nm a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+.nm a:hover{color:var(--accent);border-bottom-color:currentColor}
+.hd{display:block;font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:400;color:var(--faint);white-space:nowrap}
+.gold{display:inline-block;font-size:9.5px;letter-spacing:.05em;padding:0 4px;border-radius:2px;border:1px solid #C9A227;color:#8F7010;margin-left:5px;vertical-align:1px}
+:root[data-theme="dark"] .gold,:root:not([data-theme="light"]) .gold{color:#D7B547}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .gold{color:#8F7010}}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.num{font-family:"IBM Plex Mono",monospace;font-size:12px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.ss{font-size:12px;white-space:nowrap;color:var(--muted)}
+.ss::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:1px;background:currentColor}
+.ss.s0{color:var(--v0)}.ss.s1{color:var(--v2)}.ss.s2,.ss.s3,.ss.s4{color:var(--v3)}
+.mt{font-size:12px;white-space:nowrap}
+.mt.m0{color:var(--v0)}.mt.m1{color:var(--v2)}.mt.m2{color:var(--v3)}.mt.m3{color:var(--faint)}
+.su{min-width:15em;max-width:24em}
+.no{min-width:15em;max-width:26em;color:var(--muted);font-size:13px}
+.st a{font-family:"IBM Plex Mono",monospace;font-size:11.5px;word-break:break-all;color:var(--muted);text-decoration:none}
+.st a:hover{color:var(--accent);text-decoration:underline}
+.st span{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+.pg{display:flex;gap:6px;align-items:center;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.pg button{font:inherit;font-size:12.5px;font-family:"IBM Plex Mono",monospace;background:var(--surface);color:var(--ink);border:1px solid var(--rule);padding:5px 11px;border-radius:4px;cursor:pointer}
+.pg button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.pg button:disabled{color:var(--faint);cursor:default}
+.pg .info{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);padding:0 8px;font-variant-numeric:tabular-nums}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+.notes{margin-top:30px;padding-top:18px;border-top:1px solid var(--rule);color:var(--muted);font-size:12.5px;max-width:88ch;line-height:1.7}
+.notes p{margin:0 0 7px}
+.notes b{color:var(--ink);font-weight:600}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:760px){.top{grid-template-columns:1fr}.stamp{text-align:left}.vlegend{grid-template-columns:repeat(2,1fr);gap:10px}}
+
+.presets{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 14px}
+.presets button{font:inherit;font-size:12.5px;background:var(--surface);color:var(--ink);border:1px solid var(--rule);padding:6px 11px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:7px}
+.presets button:hover{border-color:var(--accent)}
+.presets button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .presets button[aria-pressed="true"],:root:not([data-theme="light"]) .presets button[aria-pressed="true"]{color:#08110C}
+.presets b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:11.5px;opacity:.75}
+.tok{display:inline-block;font-size:11px;padding:1px 6px;border-radius:3px;white-space:nowrap;border:1px solid}
+.tok.t0{color:var(--accent);border-color:var(--accent);background:var(--accent-bg)}
+.tok.t1{color:var(--muted);border-color:var(--rule)}
+.tok.t2{color:var(--v3);border-color:var(--v3);background:var(--v3bg)}
+.tok.t3{color:var(--v2);border-color:var(--v2);background:var(--v2bg)}
+.tok.unchecked{border-style:dashed;opacity:.75}
+.ca{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint);white-space:nowrap}
+.ca a{color:var(--muted);text-decoration:none}
+.ca a:hover{color:var(--accent);text-decoration:underline}
+.cv{font-size:11.5px;white-space:nowrap}
+.cv.c1{color:var(--v0);font-weight:600}.cv.c4{color:var(--v3);font-weight:600}
+.cv.c5,.cv.c6,.cv.c7{color:var(--v2)}.cv.c0{color:var(--faint)}.cv.c2,.cv.c3{color:var(--muted)}
+
+.hist{display:flex;align-items:flex-end;gap:3px;height:104px;padding:0 0 0 0}
+.hcol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;cursor:pointer;border-radius:2px 2px 0 0;overflow:hidden;background:none;border:0;padding:0;min-width:0}
+.hcol:hover{outline:1px solid var(--accent);outline-offset:1px}
+.hcol[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
+.hcol i{display:block;width:100%}
+.hax{display:flex;gap:3px;margin-top:5px}
+.hax span{flex:1;text-align:center;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint);min-width:0;overflow:hidden;white-space:nowrap}
+.hnote{margin-top:6px;font-size:12px;color:var(--muted)}
+.dcell{white-space:nowrap}
+.dcell b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.dcell span{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint)}
+
+/* row actions */
+.act{white-space:nowrap;display:flex;gap:4px}
+.act button{width:24px;height:24px;display:grid;place-items:center;padding:0;border:1px solid var(--rule);background:var(--surface);
+ color:var(--faint);border-radius:4px;cursor:pointer;font-size:12px;line-height:1;font-family:inherit}
+.act button:hover{color:var(--ink);border-color:var(--muted)}
+.act button.x:hover{color:var(--v3);border-color:var(--v3);background:var(--v3bg)}
+tr.dim td{opacity:.42}
+tr.dim td .vp,tr.dim td .tok{opacity:.7}
+/* workbench toolbar */
+.bench{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:9px 12px;margin-bottom:12px;
+ background:var(--surface);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow)}
+.bench .lbl{font-size:12px;color:var(--muted)}
+.bench .lbl b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.bench .sep{width:1px;height:16px;background:var(--rule)}
+.bench button{font:inherit;font-size:12.5px;background:none;color:var(--accent);border:0;padding:4px 6px;border-radius:4px;cursor:pointer}
+.bench button:hover{background:var(--accent-bg)}
+.bench button:disabled{color:var(--faint);cursor:default;background:none}
+.bench label{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;margin-left:auto}
+.bench input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px}
+.bench .dbst{font-size:11.5px;color:var(--faint);font-family:"IBM Plex Mono",monospace}
+/* toast */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:12px;
+ background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:6px;box-shadow:0 6px 22px rgba(0,0,0,.28);font-size:13px;max-width:92vw}
+.toast button{font:inherit;font-size:12.5px;background:none;border:0;color:var(--bg);text-decoration:underline;cursor:pointer;padding:0;opacity:.85}
+.toast button:hover{opacity:1}
+.toast .cls{text-decoration:none;font-size:16px;line-height:1;opacity:.6}
+/* manage panel */
+.mask{position:fixed;inset:0;background:rgba(10,16,13,.5);z-index:70;display:grid;place-items:center;padding:20px}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:6px;max-width:760px;width:100%;max-height:82vh;
+ display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.panel header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--rule)}
+.panel h3{font-family:Archivo,sans-serif;font-size:15px;margin:0;font-weight:700}
+.panel .close{margin-left:auto;background:none;border:0;font-size:20px;color:var(--muted);cursor:pointer;line-height:1;font-family:inherit}
+.panel .body{overflow:auto;padding:4px 16px 14px}
+.panel .foot{padding:12px 16px;border-top:1px solid var(--rule);display:flex;gap:10px;align-items:center}
+.panel .foot button{font:inherit;font-size:13px;padding:6px 12px;border-radius:4px;border:1px solid var(--rule);background:var(--surface);color:var(--ink);cursor:pointer}
+.panel .foot button:hover{border-color:var(--accent);color:var(--accent)}
+.xrow{display:grid;grid-template-columns:1fr 190px 66px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule2)}
+.xrow:last-child{border-bottom:0}
+.xrow .who{font-size:13px;min-width:0}
+.xrow .who a{color:var(--ink);text-decoration:none;font-weight:600}
+.xrow .who a:hover{color:var(--accent)}
+.xrow .who span{display:block;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint)}
+.xrow input{font:inherit;font-size:12.5px;width:100%;padding:5px 7px;border:1px solid var(--rule);border-radius:4px;background:var(--bg);color:var(--ink)}
+.xrow button{font:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--rule);background:var(--surface);color:var(--muted);border-radius:4px;cursor:pointer}
+.xrow button:hover{color:var(--accent);border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+.chips button{font:inherit;font-size:12px;padding:3px 9px;border-radius:14px;border:1px solid var(--rule);background:var(--surface);color:var(--muted);cursor:pointer}
+.chips button:hover{border-color:var(--accent);color:var(--accent)}
+.pempty{padding:26px 0;text-align:center;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+.cover{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:12px 14px;box-shadow:var(--shadow)}
+.cover p{margin:9px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.cover p b{color:var(--ink);font-family:"IBM Plex Mono",monospace;font-weight:600}
+.coverbar{height:6px;background:var(--rule2);border-radius:3px;overflow:hidden}
+.coverbar i{display:block;height:100%;background:var(--accent);width:0}
+</style>
+<div class="wrap">
+<div class="top">
+ <div>
+  <h1>Robinhood 链项目核验台</h1>
+  <p class="lede">对 <b>3,473</b> 个近三个月新建的 X 认证项目账号，逐一抓取官网核对其说法，并把简介与官网里出现的 <b>1,273</b> 个合约地址全部拿到链上验证。<b>323</b> 个有真实可用产品，<b>90</b> 个带骗局信号，<b>2,203</b> 个尚未发币。点项目名跳转官方 X。</p>
+ </div>
+ <div class="stamp">账号快照 <b>2026-09-08</b><br>官网抓取 <b>2026-09-09</b><br>链 ID <b>4663</b> · 覆盖率 <b>100%</b></div>
+</div>
+
+<section>
+ <div class="cover"><div class="coverbar"><i id="coverbar"></i></div><p id="cover"></p></div>
+</section>
+
+<section>
+ <h2 class="h2">判定构成 <em>点击筛选</em></h2>
+ <div class="vbar" id="vbar"></div>
+ <div class="vlegend" id="vlegend"></div>
+</section>
+
+<section>
+ <h2 class="h2">推特账号建号时间 <em>按周，颜色为该周账号的判定构成 · 点击筛选</em></h2>
+ <div class="hist" id="hist"></div>
+ <div class="hax" id="hax"></div>
+ <p class="hnote" id="hnote"></p>
+</section>
+
+<section>
+ <h2 class="h2">按赛道分布 <em>条形为该类别内四种判定的占比</em></h2>
+ <div class="cats" id="cats"></div>
+</section>
+
+<section>
+ <h2 class="h2">全部账号</h2>
+ <div class="presets" id="presets">
+  <button data-p="all">全部 <b></b></button>
+  <button data-p="gem">未发币 · 有真实产品 <b></b></button>
+  <button data-p="gemall">同上 · 含推文未读 <b></b></button>
+  <button data-p="pro">有真实产品 <b></b></button>
+  <button data-p="nocoin">尚未发币 <b></b></button>
+  <button data-p="scam">骗局信号 <b></b></button>
+  <button data-p="badca">合约与宣称不符 <b></b></button>
+ </div>
+ <div class="bench">
+  <span class="lbl">已隐藏 <b id="nHide">0</b></span>
+  <button id="unhideAll" disabled>全部恢复</button>
+  <span class="sep"></span>
+  <span class="lbl">已剔除 <b id="nDrop">0</b></span>
+  <button id="manage" disabled>管理名单</button>
+  <button id="dropFiltered">剔除当前筛选结果</button>
+  <span class="sep"></span>
+  <button id="exportCsv">导出当前列表</button>
+  <span class="dbst" id="dbst">名单存储：检测中…</span>
+  <label><input type="checkbox" id="showDropped"> 显示已剔除项</label>
+ </div>
+ <div class="ctl">
+  <input id="q" type="search" placeholder="搜索项目名、@handle、描述…" aria-label="搜索">
+  <select id="fs" aria-label="官网状态"><option value="">官网状态：全部</option><option value="0">正常有内容</option><option value="1">纯 JS 空壳</option><option value="2">403/404 打不开</option><option value="3">域名/TLS 失败</option><option value="4">5xx 错误</option></select>
+  <select id="fm" aria-label="是否相符"><option value="">与简介：全部</option><option value="0">相符</option><option value="1">部分相符</option><option value="2">不符</option><option value="3">无法核实</option></select>
+  <select id="ft" aria-label="发币状态"><option value="">发币状态：全部</option><option value="0">尚未发币</option><option value="0c">尚未发币（推文已查）</option><option value="1">已发币</option><option value="2">挂了地址但链上不存在</option><option value="3">仅有交易链接</option></select>
+  <select id="fv" aria-label="认证"><option value="">认证：全部</option><option value="1">仅金标</option></select>
+  <select id="so" aria-label="排序"><option value="vd">排序：判定</option><option value="d-new">建号时间 · 最新在前</option><option value="d-old">建号时间 · 最早在前</option><option value="fo">粉丝多在前</option></select>
+  <button class="reset" id="reset">清除筛选</button>
+  <span class="cnt" id="cnt"></span>
+ </div>
+ <div class="tw">
+  <table>
+   <thead><tr>
+    <th></th><th data-k="vd">判定</th><th data-k="nm">项目 / 官方 X</th><th data-k="cat">赛道</th>
+    <th data-k="fo" class="num">粉丝</th><th data-k="d">推特建号</th>
+    <th data-k="ss">官网状态</th><th data-k="mt">与简介</th>
+    <th data-k="tok">发币</th><th data-k="cv">合约核验</th><th>合约地址</th><th>官网</th>
+    <th data-k="su">做什么</th><th>核验依据</th>
+   </tr></thead>
+   <tbody id="tb"></tbody>
+  </table>
+  <div class="empty" id="empty" hidden>没有符合条件的账号。</div>
+ </div>
+ <div class="pg" id="pg"></div>
+</section>
+
+<div class="notes">
+ <p><b>怎么读这张表。</b>“判定”只反映核验当天官网上能看到的东西，不是投资建议，也不预测代币表现。账号新、粉丝少在这批数据里是常态，不作为扣分项。</p>
+ <p><b>骗局信号</b>指官网或简介上出现了可指认的具体问题：冒用 Robinhood、Uniswap、诺基亚、微软等真实品牌；把别人现成的网站当作自己的产品；承诺固定高息或“只涨不跌”；连钱包领空投式页面；伪造托管规模、审计或中奖流水；纯预售募资而无产品。</p>
+ <p><b>无法核实</b>多数是前端为纯 JS 应用，抓取只拿到空壳；这类站点在浏览器里可能完全正常，需要人工打开确认。403 与 TLS 失败也可能只是屏蔽了抓取程序。</p>
+ <p><b>隐藏与剔除。</b>每行最左侧有两个按钮。<b>隐藏</b>用来临时清掉噪音，点“全部恢复”即可复原。<b>剔除</b>是研究判断，会留在名单里并可以补一句原因，比如已归零、已跑路、长期无进展。两者都不改动原始数据，只影响你看到的列表。</p>
+ <p><b>团队名单与本机改动。</b>剔除名单分两层。仓库里的 <code>data/excluded.json</code> 是团队共享的基线，谁剔除的、什么时候、为什么都有记录，打开页面时自动生效，在管理面板里标注为“团队”。你自己在页面上的剔除只存在这台设备的浏览器里。要把本机判断变成团队共识，在管理面板点“复制为仓库格式”，把内容提交进仓库即可；也可以直接用命令行 <code>scan/exclude.py add @handle 原因</code>。恢复团队名单里的项目只在本机生效，不会影响别人。</p>
+ <p><b>发币状态与合约核验。</b>“已发币”指该账号的简介或官网里出现过合约地址，且该地址在 Robinhood 链或其他链上确实有合约代码。全部 1,273 个地址逐一用官方 RPC 查过 <code>eth_getCode</code> 与 ERC-20 接口：1,220 个在 Robinhood 链上有代码，18 个在 Base、以太坊或 BSC 上，35 个在查过的八条链上都不存在。“与宣称不符”指简介自称的代币符号和链上读到的 <code>symbol()</code> 对不上。本次只能读到简介与官网里的地址，账号推文内容不在数据集中，因此“尚未发币”应理解为“公开资料里没有露出合约地址”。</p>
+ <p><b>金标</b>是 X 的付费组织认证，与项目质量无关：这批里有 33 粉的金标，也有 2.6 万粉的金标空壳。</p>
+</div>
+</div>
