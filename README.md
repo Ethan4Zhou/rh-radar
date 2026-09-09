@@ -38,11 +38,11 @@ site/build_site.py   inline data.json into a single self-contained index.html
 
 ## Where the page is served
 
-GitHub Pages serves `site/` from this repo:
+GitHub Pages serves `docs/` from this repo:
 
   https://ethan4zhou.github.io/rh-radar/
 
-Every scan cycle rebuilds `site/index.html` and pushes it, and Pages redeploys
+Every scan cycle rebuilds `docs/index.html` and pushes it, and Pages redeploys
 within a minute or so.
 
 ## What is and is not in this repo

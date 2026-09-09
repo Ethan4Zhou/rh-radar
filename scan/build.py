@@ -133,7 +133,7 @@ def main():
 
     payload = {"cats": cats, "rows": rows, "hist": hist,
                "builtAt": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")}
-    out = ROOT / "site" / "data.json"
+    out = ROOT / "docs" / "data.json"
     out.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
 
     checked = sum(1 for v in tsig.values() if v.get("fetched"))
